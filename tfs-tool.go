@@ -23,8 +23,10 @@ import (
 	"github.com/wsxiaoys/terminal/color"
 )
 
+// tfs-tool - version identifier
 const Version = "0.1"
 
+// ConfigT - tfs-tool.cfg data elements
 type ConfigT struct {
 	BaseURL    string
 	User       string
@@ -32,8 +34,10 @@ type ConfigT struct {
 	Collection string
 }
 
+// Config - Configuration data
 var Config ConfigT
 
+// FlagsT - cli flag elements
 type FlagsT struct {
 	UserID         string
 	Password       string
@@ -42,6 +46,7 @@ type FlagsT struct {
 	Color          bool
 }
 
+// Flags - Flag data
 var Flags FlagsT
 
 var key = []byte("caskd92h3jfld0u3jlaafsd08jz2cv3a")
@@ -291,17 +296,15 @@ func decrypt(key, text []byte) ([]byte, error) {
 func getUser() string {
 	if Flags.UserID != "" {
 		return Flags.UserID
-	} else {
-		return Config.User
 	}
+	return Config.User
 }
 
 func getPassword() string {
 	if Flags.Password != "" {
 		return Flags.Password
-	} else {
-		return Config.Password
 	}
+	return Config.Password
 }
 
 func check(e error) {
