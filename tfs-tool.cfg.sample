@@ -1,0 +1,6 @@
+# Sample tfs-tool config file - TOML format
+
+#BaseURL = "http://tfs_server_url:8080/tfs"
+#User = "tfs_user_id"
+#Password = "tfs_password"
+#Collection = "Default"
