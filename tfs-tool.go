@@ -23,18 +23,18 @@ import (
 	"github.com/wsxiaoys/terminal/color"
 )
 
-const Version = "0.1"
+const version = "0.1"
 
-type ConfigT struct {
+type configT struct {
 	BaseURL    string
 	User       string
 	Password   string
 	Collection string
 }
 
-var Config ConfigT
+var config configT
 
-type FlagsT struct {
+type flagsT struct {
 	UserID         string
 	Password       string
 	DestinationDir string
@@ -42,37 +42,37 @@ type FlagsT struct {
 	Color          bool
 }
 
-var Flags FlagsT
+var flags flagsT
 
 var key = []byte("caskd92h3jfld0u3jlaafsd08jz2cv3a")
 
 func main() {
 
-	_, err := toml.DecodeFile("tfs-tool.cfg", &Config)
+	_, err := toml.DecodeFile("tfs-tool.cfg", &config)
 	check(err)
 
-	if !strings.HasPrefix(Config.Password, "~~") {
-		ciphertext, err := encrypt(key, []byte(Config.Password))
+	if !strings.HasPrefix(config.Password, "~~") {
+		ciphertext, err := encrypt(key, []byte(config.Password))
 		check(err)
 
-		Config.Password = "~~" + hex.EncodeToString(ciphertext)
+		config.Password = "~~" + hex.EncodeToString(ciphertext)
 
-		var ConfigBuffer bytes.Buffer
-		toml.NewEncoder(&ConfigBuffer).Encode(Config)
+		var configBuffer bytes.Buffer
+		toml.NewEncoder(&configBuffer).Encode(config)
 
-		err = ioutil.WriteFile("tfs-tool.cfg", ConfigBuffer.Bytes(), 0644)
+		err = ioutil.WriteFile("tfs-tool.cfg", configBuffer.Bytes(), 0644)
 		check(err)
 
 	} else {
-		encPassword, _ := hex.DecodeString(Config.Password[2:])
+		encPassword, _ := hex.DecodeString(config.Password[2:])
 		result, err := decrypt(key, encPassword)
 		check(err)
-		Config.Password = string(result)
+		config.Password = string(result)
 	}
 
 	//
 
-	var CmdListProject = &cobra.Command{
+	var cmdListProject = &cobra.Command{
 		Use:   "listprojects",
 		Short: "List TFS Proejects",
 		Long:  ``,
@@ -81,7 +81,7 @@ func main() {
 		},
 	}
 
-	var CmdListRepos = &cobra.Command{
+	var cmdListRepos = &cobra.Command{
 		Use:   "listrepos",
 		Short: "List TFS repositories",
 		Long:  ``,
@@ -90,7 +90,7 @@ func main() {
 		},
 	}
 
-	var CmdPullAll = &cobra.Command{
+	var cmdPullAll = &cobra.Command{
 		Use:   "pullall",
 		Short: "Pull all TFS repositories",
 		Long:  ``,
@@ -98,34 +98,32 @@ func main() {
 			pullAll()
 		},
 	}
-	CmdPullAll.Flags().StringVarP(&Flags.DestinationDir, "dest", "d", "", "Output directory to store repositories")
+	cmdPullAll.Flags().StringVarP(&flags.DestinationDir, "dest", "d", "", "Output directory to store repositories")
 
-	var CmdVersion = &cobra.Command{
+	var cmdversion = &cobra.Command{
 		Use:   "version",
 		Short: "Print the version number of tfs-tool",
 		Long:  `All software has versions. This is tfs-tool's`,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println(Version)
+			fmt.Println(version)
 		},
 	}
 
-	var RootCmd = &cobra.Command{Use: "tfs-tool"}
-	RootCmd.AddCommand(CmdListProject, CmdListRepos, CmdPullAll, CmdVersion)
+	var cmdRoot = &cobra.Command{Use: "tfs-tool"}
+	cmdRoot.AddCommand(cmdListProject, cmdListRepos, cmdPullAll, cmdversion)
 
-	RootCmd.PersistentFlags().BoolVarP(&Flags.Verbose, "verbose", "v", false, "verbose output")
-	RootCmd.PersistentFlags().BoolVarP(&Flags.Color, "color", "", false, "colorize output")
+	cmdRoot.PersistentFlags().BoolVarP(&flags.Verbose, "verbose", "v", false, "verbose output")
+	cmdRoot.PersistentFlags().BoolVarP(&flags.Color, "color", "", false, "colorize output")
+	cmdRoot.PersistentFlags().StringVarP(&flags.UserID, "user", "", "", "TFS User ID")
+	cmdRoot.PersistentFlags().StringVarP(&flags.Password, "password", "", "", "TFS Password")
 
-	RootCmd.PersistentFlags().StringVarP(&Flags.UserID, "user", "", "", "TFS User ID")
-
-	RootCmd.PersistentFlags().StringVarP(&Flags.Password, "password", "", "", "TFS Password")
-
-	RootCmd.Execute()
+	cmdRoot.Execute()
 
 }
 
 func listProjects() {
 
-	projectsJSON := callTFS("/" + Config.Collection + "/_apis/projects?api-version=1.0-preview.2")
+	projectsJSON := callTFS("/" + config.Collection + "/_apis/projects?api-version=1.0-preview.2")
 
 	for _, pi := range projectsJSON.Get("value").MustArray() {
 
@@ -139,16 +137,16 @@ func listProjects() {
 
 func listRepos() {
 
-	projects := callTFS("/" + Config.Collection + "/_apis/projects?api-version=1.0-preview.2")
+	projects := callTFS("/" + config.Collection + "/_apis/projects?api-version=1.0-preview.2")
 
 	for _, pi := range projects.Get("value").MustArray() {
 		p, _ := pi.(map[string]interface{})
 
 		projectName := p["name"].(string)
 
-		reposJSON := callTFS("/" + Config.Collection + "/_apis/git/" + projectName + "/repositories?api-version=1.0-preview.1")
+		reposJSON := callTFS("/" + config.Collection + "/_apis/git/" + projectName + "/repositories?api-version=1.0-preview.1")
 
-		if Flags.Color {
+		if flags.Color {
 			color.Println("@{c}" + projectName)
 		} else {
 			fmt.Println(projectName)
@@ -160,7 +158,7 @@ func listRepos() {
 			remoteURL := r["remoteUrl"].(string)
 			name := r["name"].(string)
 
-			if Flags.Color {
+			if flags.Color {
 				color.Println("  @g" + name + " @y-> @w" + remoteURL)
 			} else {
 				fmt.Println("  " + name + " -> " + remoteURL)
@@ -173,23 +171,23 @@ func listRepos() {
 
 func pullAll() {
 
-	if Flags.DestinationDir == "" {
+	if flags.DestinationDir == "" {
 		fmt.Println("ERROR: Output directory required")
 		return
 	}
 
-	os.MkdirAll(Flags.DestinationDir, 0777)
-	os.Chdir(Flags.DestinationDir)
+	os.MkdirAll(flags.DestinationDir, 0777)
+	os.Chdir(flags.DestinationDir)
 	baseDir, _ := os.Getwd()
 
-	projects := callTFS("/" + Config.Collection + "/_apis/projects?api-version=1.0-preview.2")
+	projects := callTFS("/" + config.Collection + "/_apis/projects?api-version=1.0-preview.2")
 
 	for _, pi := range projects.Get("value").MustArray() {
 		p, _ := pi.(map[string]interface{})
 
 		projectName := p["name"].(string)
 
-		reposJSON := callTFS("/" + Config.Collection + "/_apis/git/" + projectName + "/repositories?api-version=1.0-preview.1")
+		reposJSON := callTFS("/" + config.Collection + "/_apis/git/" + projectName + "/repositories?api-version=1.0-preview.1")
 
 		for _, ri := range reposJSON.Get("value").MustArray() {
 			r, _ := ri.(map[string]interface{})
@@ -206,11 +204,11 @@ func pullAll() {
 			err := os.Chdir(name)
 			if err != nil {
 				fmt.Println("Cloning - " + name)
-				exeCmd("git clone " + remoteURLAuth)
+				execmd("git clone " + remoteURLAuth)
 			} else {
 				os.Chdir(name)
 				fmt.Println("Pulling - " + name)
-				exeCmd("git pull " + remoteURLAuth)
+				execmd("git pull " + remoteURLAuth)
 			}
 
 		}
@@ -224,16 +222,16 @@ func addGitAuthToRemoteURL(url string) string {
 func callTFS(cmd string) *simplejson.Json {
 	var curl = "curl -s --ntlm -k --negotiate -u " + getUser() + ":" + getPassword() + " "
 
-	output := exeCmd(curl + Config.BaseURL + cmd)
+	output := execmd(curl + config.BaseURL + cmd)
 
 	js, _ := simplejson.NewJson([]byte(output))
 
 	return js
 }
 
-func exeCmd(cmd string) string {
+func execmd(cmd string) string {
 
-	if Flags.Verbose {
+	if flags.Verbose {
 		fmt.Println("command is ", cmd)
 	}
 
@@ -246,7 +244,7 @@ func exeCmd(cmd string) string {
 		fmt.Printf("%s\n", err)
 	}
 
-	if Flags.Verbose {
+	if flags.Verbose {
 		fmt.Printf("%s\n", out)
 	}
 
@@ -289,19 +287,17 @@ func decrypt(key, text []byte) ([]byte, error) {
 }
 
 func getUser() string {
-	if Flags.UserID != "" {
-		return Flags.UserID
-	} else {
-		return Config.User
+	if flags.UserID != "" {
+		return flags.UserID
 	}
+	return config.User
 }
 
 func getPassword() string {
-	if Flags.Password != "" {
-		return Flags.Password
-	} else {
-		return Config.Password
+	if flags.Password != "" {
+		return flags.Password
 	}
+	return config.Password
 }
 
 func check(e error) {
