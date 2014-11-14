@@ -137,12 +137,26 @@ func listProjects() {
 
 func listRepos() {
 
+	type repositoryT struct {
+		remoteURL string
+		name      string
+	}
+
+	type projectsT struct {
+		projectName string
+		repository  []repositoryT
+	}
+
 	projects := callTFS("/" + config.Collection + "/_apis/projects?api-version=1.0-preview.2")
 
-	for _, pi := range projects.Get("value").MustArray() {
+	var data []projectsT = make([]projectsT, projects.Get("count").MustInt())
+
+	for i, pi := range projects.Get("value").MustArray() {
 		p, _ := pi.(map[string]interface{})
 
 		projectName := p["name"].(string)
+
+		data[i].projectName = projectName
 
 		reposJSON := callTFS("/" + config.Collection + "/_apis/git/" + projectName + "/repositories?api-version=1.0-preview.1")
 
@@ -152,11 +166,18 @@ func listRepos() {
 			fmt.Println(projectName)
 		}
 
-		for _, ri := range reposJSON.Get("value").MustArray() {
+		var rData []repositoryT = make([]repositoryT, reposJSON.Get("count").MustInt())
+
+		for j, ri := range reposJSON.Get("value").MustArray() {
 			r, _ := ri.(map[string]interface{})
 
 			remoteURL := r["remoteUrl"].(string)
 			name := r["name"].(string)
+
+			rData[j].remoteURL = remoteURL
+			rData[j].name = name
+
+			data[i].repository = rData
 
 			if flags.Color {
 				color.Println("  @g" + name + " @y-> @w" + remoteURL)
@@ -166,6 +187,8 @@ func listRepos() {
 		}
 
 	}
+
+	fmt.Println(data)
 
 }
 
