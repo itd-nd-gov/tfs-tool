@@ -75,11 +75,8 @@ func listRepos() {
 
 	}
 
-	// Sort
-
 	sort.Sort(byNameProjectT(data))
 
-	// Output
 	for _, project := range data {
 
 		if lib.Flags.Color {
