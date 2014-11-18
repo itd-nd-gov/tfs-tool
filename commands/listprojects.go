@@ -22,21 +22,21 @@ func listProjects() {
 
 	projectsJSON := lib.CallTFS("/" + lib.Config.Collection + "/_apis/projects?api-version=1.0-preview.2")
 
-	data := []projectT{}
+	projects := []project{}
 
 	for _, pi := range projectsJSON.Get("value").MustArray() {
 
 		p := pi.(map[string]interface{})
 
-		pp := projectT{name: p["name"].(string)}
+		project := project{name: p["name"].(string)}
 
-		data = append(data, pp)
+		projects = append(projects, project)
 
 	}
 
-	sort.Sort(byNameProjectT(data))
+	sort.Sort(projectsByName{projects})
 
-	for _, project := range data {
+	for _, project := range projects {
 
 		if lib.Flags.Color {
 			color.Println("@{c}" + project.name)

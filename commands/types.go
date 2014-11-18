@@ -1,25 +1,33 @@
 package commands
 
-type repositoryT struct {
+type repository struct {
 	remoteURL string
 	name      string
 }
 
-type projectT struct {
-	name       string
-	repository []repositoryT
+type repositories []repository
+
+func (a repositories) Len() int      { return len(a) }
+func (a repositories) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+type repositoriesByName struct{ repositories }
+
+func (a repositoriesByName) Less(i, j int) bool {
+	return a.repositories[i].name < a.repositories[j].name
 }
 
-// Sorting
+//
 
-type byNameProjectT []projectT
+type project struct {
+	name string
+	repositories
+}
 
-func (a byNameProjectT) Len() int           { return len(a) }
-func (a byNameProjectT) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a byNameProjectT) Less(i, j int) bool { return a[i].name < a[j].name }
+type projects []project
 
-type byNameRepositoryT []repositoryT
+func (a projects) Len() int      { return len(a) }
+func (a projects) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-func (a byNameRepositoryT) Len() int           { return len(a) }
-func (a byNameRepositoryT) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a byNameRepositoryT) Less(i, j int) bool { return a[i].name < a[j].name }
+type projectsByName struct{ projects }
+
+func (a projectsByName) Less(i, j int) bool { return a.projects[i].name < a.projects[j].name }

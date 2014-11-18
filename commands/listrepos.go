@@ -20,41 +20,41 @@ var cmdListRepos = &cobra.Command{
 
 func listRepos() {
 
-	projects := lib.CallTFS("/" + lib.Config.Collection + "/_apis/projects?api-version=1.0-preview.2")
+	projectsJSON := lib.CallTFS("/" + lib.Config.Collection + "/_apis/projects?api-version=1.0-preview.2")
 
-	data := []projectT{}
+	projects := []project{}
 
-	for _, pi := range projects.Get("value").MustArray() {
+	for _, pi := range projectsJSON.Get("value").MustArray() {
 		p, _ := pi.(map[string]interface{})
 
 		name := p["name"].(string)
 
-		pp := projectT{name: name}
+		project := project{name: name}
 
 		reposJSON := lib.CallTFS("/" + lib.Config.Collection + "/_apis/git/" + name + "/repositories?api-version=1.0-preview.1")
 
-		rData := []repositoryT{}
+		repositories := []repository{}
 
 		for _, ri := range reposJSON.Get("value").MustArray() {
 			r, _ := ri.(map[string]interface{})
 
-			rData = append(rData,
-				repositoryT{
+			repositories = append(repositories,
+				repository{
 					remoteURL: r["remoteUrl"].(string),
 					name:      r["name"].(string),
 				},
 			)
 		}
 
-		sort.Sort(byNameRepositoryT(rData))
-		pp.repository = rData
-		data = append(data, pp)
+		sort.Sort(repositoriesByName{repositories})
+		project.repositories = repositories
+		projects = append(projects, project)
 
 	}
 
-	sort.Sort(byNameProjectT(data))
+	sort.Sort(projectsByName{projects})
 
-	for _, project := range data {
+	for _, project := range projects {
 
 		if lib.Flags.Color {
 			color.Println("@{c}" + project.name)
@@ -62,7 +62,7 @@ func listRepos() {
 			fmt.Println(project.name)
 		}
 
-		for _, repo := range project.repository {
+		for _, repo := range project.repositories {
 			if lib.Flags.Color {
 				color.Println("  @g" + repo.name + " @y-> @w" + repo.remoteURL)
 			} else {
