@@ -17,6 +17,7 @@ func AddCommands() {
 	// CmdRoot.AddCommand(cmdListProject, cmdListRepos, cmdPullAll, cmdversion)
 	CmdRoot.AddCommand(cmdListRepos)
 	CmdRoot.AddCommand(cmdListProject)
+	CmdRoot.AddCommand(cmdGitPullAll)
 	CmdRoot.AddCommand(cmdVersion)
 }
 

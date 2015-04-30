@@ -11,7 +11,7 @@ import (
 
 var cmdListProject = &cobra.Command{
 	Use:   "listprojects",
-	Short: "List TFS Proejects",
+	Short: "List TFS projects",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		listProjects()
