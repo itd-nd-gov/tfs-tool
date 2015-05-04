@@ -20,7 +20,7 @@ func CallTFS(cmd string) *simplejson.Json {
 
 func execmd(cmd string) string {
 
-	jww.TRACE.Println("command is ", cmd)
+	jww.TRACE.Println("cmd: ", cmd)
 
 	parts := strings.Fields(cmd)
 	head := parts[0]
@@ -28,10 +28,10 @@ func execmd(cmd string) string {
 
 	out, err := exec.Command(head, parts...).Output()
 	if err != nil {
-		jww.WARN.Printf("%s\n", err)
+		jww.WARN.Printf("err: %s\n", err)
 	}
 
-	jww.TRACE.Printf("%s\n", out)
+	jww.TRACE.Printf("out: %s\n", out)
 
 	return string(out)
 }
