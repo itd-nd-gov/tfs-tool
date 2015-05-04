@@ -1,11 +1,11 @@
 package lib
 
 import (
-	"fmt"
 	"os/exec"
 	"strings"
 
 	"github.com/bitly/go-simplejson"
+	jww "github.com/spf13/jwalterweatherman"
 )
 
 func CallTFS(cmd string) *simplejson.Json {
@@ -20,9 +20,7 @@ func CallTFS(cmd string) *simplejson.Json {
 
 func execmd(cmd string) string {
 
-	if Flags.Verbose {
-		fmt.Println("command is ", cmd)
-	}
+	jww.TRACE.Println("command is ", cmd)
 
 	parts := strings.Fields(cmd)
 	head := parts[0]
@@ -30,12 +28,10 @@ func execmd(cmd string) string {
 
 	out, err := exec.Command(head, parts...).Output()
 	if err != nil {
-		fmt.Printf("%s\n", err)
+		jww.WARN.Printf("%s\n", err)
 	}
 
-	if Flags.Verbose {
-		fmt.Printf("%s\n", out)
-	}
+	jww.TRACE.Printf("%s\n", out)
 
 	return string(out)
 }

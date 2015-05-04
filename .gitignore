@@ -1,4 +1,6 @@
 *.a
 tfs-tool
+tfs-tool.exe
 tfs-tool.cfg
 *.orig
+repos/**

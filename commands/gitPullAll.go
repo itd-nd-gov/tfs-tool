@@ -2,11 +2,11 @@ package commands
 
 import (
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/ecornell/tfs-tool/lib"
 	"github.com/spf13/cobra"
+	jww "github.com/spf13/jwalterweatherman"
 )
 
 var cmdGitPullAll = &cobra.Command{
@@ -72,7 +72,7 @@ func pullAll() {
 		break
 	}
 
-	// cleanup deleted projects
+	// cleanup deleted team projects
 	dir, _ := os.Open(baseDir)
 	// checkErr(err)
 	defer dir.Close()
@@ -87,16 +87,13 @@ func pullAll() {
 			}
 		}
 	}
-	log.Println("Dirs: ", dirnames)
-
 	os.Chdir(baseDir)
 	for _, d := range dirnames {
-		log.Println(stringInSlice(d, projectNames))
 		if !stringInSlice(d, projectNames) {
 			os.Remove(d)
+			jww.INFO.Println("Removed - " + d)
 		}
 	}
-
 }
 
 func stringInSlice(a string, list []string) bool {
