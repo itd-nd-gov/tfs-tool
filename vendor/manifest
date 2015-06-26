@@ -1,0 +1,54 @@
+{
+	"version": 0,
+	"dependencies": [
+		{
+			"importpath": "github.com/BurntSushi/toml",
+			"repository": "https://github.com/BurntSushi/toml",
+			"revision": "056c9bc7be7190eaa7715723883caffa5f8fa3e4",
+			"branch": "master",
+			"path": ""
+		},
+		{
+			"importpath": "github.com/bitly/go-simplejson",
+			"repository": "https://github.com/bitly/go-simplejson",
+			"revision": "18db6e68d8fd9cbf2e8ebe4c81a78b96fd9bf05a",
+			"branch": "master",
+			"path": ""
+		},
+		{
+			"importpath": "github.com/spf13/jwalterweatherman",
+			"repository": "https://github.com/spf13/jwalterweatherman",
+			"revision": "3d60171a64319ef63c78bd45bd60e6eab1e75f8b",
+			"branch": "master",
+			"path": ""
+		},
+		{
+			"importpath": "github.com/spf13/cobra",
+			"repository": "https://github.com/spf13/cobra",
+			"revision": "66816bcd0378e248c613e3c443c020f544c28804",
+			"branch": "master",
+			"path": ""
+		},
+		{
+			"importpath": "github.com/inconshreveable/mousetrap",
+			"repository": "https://github.com/inconshreveable/mousetrap",
+			"revision": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75",
+			"branch": "master",
+			"path": ""
+		},
+		{
+			"importpath": "github.com/spf13/pflag",
+			"repository": "https://github.com/spf13/pflag",
+			"revision": "67cbc198fd11dab704b214c1e629a97af392c085",
+			"branch": "master",
+			"path": ""
+		},
+		{
+			"importpath": "github.com/wsxiaoys/terminal/color",
+			"repository": "https://github.com/wsxiaoys/terminal",
+			"revision": "9dcaf1d63119a8ac00eef82270eaef08b6aa2328",
+			"branch": "master",
+			"path": "/color"
+		}
+	]
+}

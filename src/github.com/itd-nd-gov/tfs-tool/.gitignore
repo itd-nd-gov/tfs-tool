@@ -1,0 +1,7 @@
+*.a
+tfs-tool
+tfs-tool.exe
+tfs-tool.cfg
+tfs-tool.log
+*.orig
+repos/**
